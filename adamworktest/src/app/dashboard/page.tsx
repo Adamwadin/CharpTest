@@ -154,7 +154,7 @@ export default function DashboardPage() {
                     <td className="p-3 text-center">
                       <button
                         onClick={() => handleView(product.id)}
-                        className="inline-flex items-center justify-center px-3 py-1 border border-gray-500 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-gray-700 hover:bg-[#14c0c7] hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14c0c7] transition-colors duration-350"
+                        className="cursor-pointer inline-flex items-center justify-center px-3 py-1 border border-gray-500 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-gray-700 hover:bg-[#14c0c7] hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14c0c7] transition-colors duration-350"
                       >
                         View
                       </button>

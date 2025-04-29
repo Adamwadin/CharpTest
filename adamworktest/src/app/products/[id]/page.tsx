@@ -414,13 +414,13 @@ export default function ProductPage() {
                   <>
                     <button
                       onClick={handleSave}
-                      className="px-4 py-2 bg-[#14c0c7] text-white rounded-md hover:bg-[#0ea5a7]"
+                      className="px-4 py-2 bg-[#14c0c7] text-white rounded-md hover:bg-[#0ea5a7] cursor-pointer"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditMode(false)}
-                      className="px-4 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-white bg-gray-700 hover:bg-gray-600"
+                      className="px-4 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-white bg-gray-700 hover:bg-gray-600 cursor-pointer"
                     >
                       Cancel
                     </button>

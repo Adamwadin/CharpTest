@@ -127,7 +127,7 @@ export default function LoginPage() {
                 className="group relative w-full overflow-hidden rounded-lg bg-red-600 py-3 text-white shadow-lg transition-all duration-300 hover:bg-red-700 hover:shadow-red-200 flex items-center justify-center gap-2"
               >
                 <LogOut size={20} />
-                <span className="font-medium">Logout</span>
+                <span className="font-medium cursor-pointer">Logout</span>
               </button>
             </div>
           ) : (
