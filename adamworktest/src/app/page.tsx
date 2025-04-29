@@ -1,11 +1,14 @@
-import LoginPage from "./login/page";
-import Footer from "./components/Footer";
-import Navbar from "./components/Navbar";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-      <LoginPage />
-    </>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/login");
+  }, [router]);
+
+  return null;
 }
