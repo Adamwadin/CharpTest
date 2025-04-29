@@ -13,6 +13,23 @@ export default function CreateProductPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  //security check for user authentication
+  // if user is not authenticated, redirect to login page
+  // so no one just types /dashboard in the url and gets access to the dashboard
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/login");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");

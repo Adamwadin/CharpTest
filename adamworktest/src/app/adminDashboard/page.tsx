@@ -27,7 +27,9 @@ export default function AdminDashboardPage() {
         .select("role")
         .eq("id", user.id)
         .single();
-
+      //security check for user authentication
+      // if user is not authenticated, redirect to login page
+      // so no one just types /dashboard in the url and gets access to the dashboard
       if (currentProfile?.role !== "admin") {
         router.push("/dashboard");
         return;

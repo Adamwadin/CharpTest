@@ -15,7 +15,9 @@ export default function LoginPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
-
+  //security check for user authentication
+  // if user is not authenticated, redirect to login page
+  // so no one just types /dashboard in the url and gets access to the dashboard
   useEffect(() => {
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser();

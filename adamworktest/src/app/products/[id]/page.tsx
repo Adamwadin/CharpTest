@@ -19,6 +19,23 @@ export default function ProductPage() {
   const [versionHistory, setVersionHistory] = useState<any[]>([]);
   const [showVersions, setShowVersions] = useState(false);
   const [openRowId, setOpenRowId] = useState<string | null>(null);
+  //security check for user authentication
+  // if user is not authenticated, redirect to login page
+  // so no one just types /dashboard in the url and gets access to the dashboard
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/login");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     if (!id) return;

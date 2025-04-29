@@ -11,6 +11,23 @@ export default function DashboardPage() {
   const [role, setRole] = useState<string | null>(null);
   const router = useRouter();
 
+  //security check for user authentication
+  // if user is not authenticated, redirect to login page
+  // so no one just types /dashboard in the url and gets access to the dashboard
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/login");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
   useEffect(() => {
     const fetchData = async () => {
       const {

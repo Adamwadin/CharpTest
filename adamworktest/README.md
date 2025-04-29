@@ -15,7 +15,7 @@ Live on charp-test.vercel.app
   - **Viewer**: Read-only access to content
 
 - Checking if user is logged in for every page so you someone cant access everything by typing the page in the URL.
-  (Check utils folder to see comment on how i built it.)
+- To make it easier for you i disregarded the option to have to verify mail when creating an account.
 
 ### Content Management
 
@@ -51,7 +51,7 @@ It Will pop up a toaster pop-up saying you need to refresh because another admin
 - **Framework:** Next.js (App Router, TypeScript)
 - **Styling:** Tailwind CSS
 - **Database & Auth:** Supabase
-- **Icons:** Lucide
+- **Icons:** Lucide-react
 - **Deployment:** Vercel
 
 ---
