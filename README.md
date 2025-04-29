@@ -1,2 +1,0 @@
-# CharpTest
-Worktest for charpstAR
