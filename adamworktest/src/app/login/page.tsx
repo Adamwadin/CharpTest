@@ -90,10 +90,7 @@ export default function LoginPage() {
       }
     }
 
-    alert("Account created successfully! Please log in now.");
-    setIsSignUp(false);
-    setEmail("");
-    setPassword("");
+    router.push("/dashboard");
   };
 
   if (loading) {
