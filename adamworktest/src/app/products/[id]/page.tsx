@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-hot-toast";
 import { Product } from "../../types/products";
+import { checkAuth } from "@/utils/checkAuth";
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,22 +20,9 @@ export default function ProductPage() {
   const [versionHistory, setVersionHistory] = useState<any[]>([]);
   const [showVersions, setShowVersions] = useState(false);
   const [openRowId, setOpenRowId] = useState<string | null>(null);
-  //security check for user authentication
-  // if user is not authenticated, redirect to login page
-  // so no one just types /dashboard in the url and gets access to the dashboard
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/login");
-      }
-    };
-
-    checkAuth();
+    checkAuth(router);
   }, [router]);
 
   useEffect(() => {
@@ -60,21 +48,6 @@ export default function ProductPage() {
         }
       }
 
-      const fetchProduct = async () => {
-        const { data, error } = await supabase
-          .from("products")
-          .select("id, title, status, price, created_at, updated_at")
-          .eq("id", id)
-          .single();
-
-        if (error) {
-          console.error("Error fetching product:", error.message);
-        } else {
-          setProduct(data);
-        }
-        setLoading(false);
-      };
-
       fetchProduct();
     };
 
@@ -83,6 +56,23 @@ export default function ProductPage() {
       fetchData();
     }, 5000);
   }, [id]);
+
+  //So i can fetch the product again after updating it
+
+  const fetchProduct = async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, title, status, price, created_at, updated_at")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching product:", error.message);
+    } else {
+      setProduct(data);
+    }
+    setLoading(false);
+  };
 
   const fetchVersions = async () => {
     const { data, error } = await supabase
@@ -140,18 +130,23 @@ export default function ProductPage() {
       new Date(latestProduct.updated_at).getTime() !==
       new Date(product.updated_at).getTime()
     ) {
-      toast.error("Another admin updated this item. Please refresh.");
+      toast.error("Another admin updated this item.");
+      toast.error("Products is now up to date, please try again.");
+      setEditMode(false);
+      fetchProduct();
+
       return;
     }
 
     const { data: userData } = await supabase.auth.getUser();
+    // I wanted to also save the current version of the product before restoring an older version
+    // but not sure of the logic yet
 
     await supabase.from("product_versions").insert({
       product_id: product.id,
       title: latestProduct.title,
       price: latestProduct.price,
       status: latestProduct.status,
-
       saved_by_user_id: userData.user?.id,
     });
 
@@ -218,11 +213,11 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+      <div className="flex items-center justify-center min-h-screen bg-login bg-gray-900">
+        <div className="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md">
           <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 border-4 border-[#14c0c7] border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-lg font-medium text-white">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-[#14c0c7] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-base sm:text-lg font-medium text-white">
               Loading product details...
             </p>
           </div>
@@ -230,14 +225,14 @@ export default function ProductPage() {
       </div>
     );
   }
-
+  // incase for some reason the product is not found, show a 404 page
   if (!product) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="bg-gray-800 p-8 rounded-lg shadow-md text-center">
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4 ">
+        <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-md text-center w-full max-w-md">
           <div className="text-gray-400 mb-4">
             <svg
-              className="mx-auto h-12 w-12"
+              className="mx-auto h-10 w-10 sm:h-12 sm:w-12"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -250,15 +245,15 @@ export default function ProductPage() {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">
             Product Not Found
           </h2>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-400 mb-4 text-sm sm:text-base">
             The product you're looking for doesn't exist or has been removed.
           </p>
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#14c0c7] hover:bg-[#0ea5a7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14c0c7]"
+            className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#14c0c7] hover:bg-[#0ea5a7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14c0c7]"
           >
             Return to Dashboard
           </button>
@@ -268,15 +263,15 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-900 py-4 sm:py-8 bg-login">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14c0c7]"
+            className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 border border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14c0c7]"
           >
             <svg
-              className="mr-2 h-4 w-4"
+              className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -293,18 +288,18 @@ export default function ProductPage() {
         </div>
 
         <div className="bg-gray-800 shadow overflow-hidden rounded-lg">
-          <div className="px-6 py-5 sm:p-8">
-            <div className="flex justify-between items-start">
-              <div>
+          <div className="px-4 py-4 sm:px-6 sm:py-5 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
+              <div className="w-full sm:w-auto">
                 {editMode ? (
                   <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full border rounded p-2 mt-1 bg-gray-700 text-white text-xl font-bold"
+                    className="w-full border rounded p-2 mt-1 bg-gray-700 text-white text-lg sm:text-xl font-bold"
                   />
                 ) : (
-                  <h1 className="text-2xl font-bold text-white sm:text-3xl">
+                  <h1 className="text-xl font-bold text-white sm:text-2xl md:text-3xl">
                     {product.title}
                   </h1>
                 )}
@@ -321,7 +316,7 @@ export default function ProductPage() {
                 ) : (
                   <div className="mt-1">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium  ${
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         product.status === "active" ||
                         product.status === "published"
                           ? "bg-green-700 text-green-200"
@@ -340,21 +335,21 @@ export default function ProductPage() {
                   step="0.01"
                   value={editPrice}
                   onChange={(e) => setEditPrice(e.target.value)}
-                  className="w-full border rounded p-2 bg-gray-700 text-white mt-1 text-lg font-semibold"
+                  className="w-full sm:w-40 border rounded p-2 bg-gray-700 text-white text-lg font-semibold"
                 />
               ) : (
-                <div className="text-2xl font-bold text-white">
+                <div className="text-xl sm:text-2xl font-bold text-white">
                   Price: Kr {product.price}
                 </div>
               )}
             </div>
 
-            <div className="mt-8 border-t border-gray-700 pt-6">
-              <h3 className="text-lg font-medium text-white">
+            <div className="mt-6 sm:mt-8 border-t border-gray-700 pt-4 sm:pt-6">
+              <h3 className="text-base sm:text-lg font-medium text-white">
                 Product Details
               </h3>
 
-              <dl className="mt-4 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+              <dl className="mt-3 sm:mt-4 grid grid-cols-1 gap-x-4 gap-y-4 sm:gap-y-6 sm:grid-cols-2">
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-400">
                     Product ID
@@ -390,14 +385,14 @@ export default function ProductPage() {
                     fetchVersions();
                   }
                 }}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 mt-8 transition duration-150 ease-in-out cursor-pointer"
+                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 mt-6 sm:mt-8 transition duration-150 ease-in-out cursor-pointer text-sm sm:text-base"
               >
                 {showVersions ? "Hide Version History" : "View Version History"}
               </button>
             )}
 
             {role === "admin" && (
-              <div className="mt-8 flex justify-end space-x-4">
+              <div className="mt-6 sm:mt-8 flex justify-end space-x-3 sm:space-x-4">
                 {!editMode ? (
                   <button
                     onClick={() => {
@@ -406,7 +401,7 @@ export default function ProductPage() {
                       setEditPrice(product.price.toString());
                       setEditStatus(product.status);
                     }}
-                    className="px-4 py-2  border border-gray-600 shadow-sm text-sm font-medium rounded-md text-white bg-[#14c0c7] hover:bg-[#0ea5a7] cursor-pointer"
+                    className="px-3 py-1 sm:px-4 sm:py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-white bg-[#14c0c7] hover:bg-[#0ea5a7] cursor-pointer"
                   >
                     Edit Product
                   </button>
@@ -414,13 +409,13 @@ export default function ProductPage() {
                   <>
                     <button
                       onClick={handleSave}
-                      className="px-4 py-2 bg-[#14c0c7] text-white rounded-md hover:bg-[#0ea5a7] cursor-pointer"
+                      className="px-3 py-1 sm:px-4 sm:py-2 bg-[#14c0c7] text-white rounded-md hover:bg-[#0ea5a7] cursor-pointer text-sm"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditMode(false)}
-                      className="px-4 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-white bg-gray-700 hover:bg-gray-600 cursor-pointer"
+                      className="px-3 py-1 sm:px-4 sm:py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-white bg-gray-700 hover:bg-gray-600 cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -430,71 +425,71 @@ export default function ProductPage() {
             )}
 
             {showVersions && (
-              <div className="mt-8">
-                <h2 className="text-lg font-semibold text-white mb-4">
+              <div className="mt-6 sm:mt-8">
+                <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
                   Version History
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {versionHistory.map((version) => (
                     <div
                       key={version.id}
-                      className="p-4 bg-gray-700 rounded-md shadow flex justify-between items-center"
+                      className="p-3 sm:p-4 bg-gray-700 rounded-md shadow"
                     >
-                      <div>
-                        <p className="text-white font-medium">
-                          {version.title}
-                        </p>
-                        <p className="text-gray-400 text-sm">
-                          Saved on {new Date(version.saved_at).toLocaleString()}
-                        </p>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+                        <div>
+                          <p className="text-white font-medium text-sm sm:text-base">
+                            {version.title}
+                          </p>
+                          <p className="text-gray-400 text-xs sm:text-sm">
+                            Saved on{" "}
+                            {new Date(version.saved_at).toLocaleString()}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                          <button
+                            onClick={() => deleteVersion(version.id)}
+                            className="px-2 py-1 text-xs sm:text-sm bg-red-600 text-white rounded hover:bg-red-500 cursor-pointer"
+                          >
+                            Delete
+                          </button>
+
+                          <button
+                            onClick={() => restoreVersion(version)}
+                            className="px-2 py-1 text-xs sm:text-sm bg-[#14c0c7] text-white rounded hover:bg-[#0ea5a7] cursor-pointer"
+                          >
+                            Restore
+                          </button>
+
+                          <button
+                            onClick={() => toggleRow(version.id)}
+                            className="px-2 py-1 text-xs sm:text-sm bg-gray-600 text-white rounded hover:bg-gray-500 cursor-pointer"
+                          >
+                            {openRowId === version.id ? "Hide" : "Show"} Details
+                          </button>
+                        </div>
                       </div>
 
-                      <div>
-                        <button
-                          onClick={() => deleteVersion(version.id)}
-                          className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-500 mr-2 cursor-pointer"
-                        >
-                          Delete
-                        </button>
-
-                        <button
-                          onClick={() => restoreVersion(version)}
-                          className="px-3 py-1 text-sm bg-[#14c0c7] text-white rounded hover:bg-[#0ea5a7] cursor-pointer"
-                        >
-                          Restore
-                        </button>
-
-                        <button
-                          onClick={() => toggleRow(version.id)}
-                          className="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-500 cursor-pointer"
-                        >
-                          {openRowId === version.id ? "Hide" : "Show"} Details
-                        </button>
-
-                        <div
-                          className={`mt-2 overflow-hidden transition-all duration-500 ease-in-out ${
-                            openRowId === version.id
-                              ? "max-h-screen"
-                              : "max-h-0"
-                          }`}
-                        >
-                          <p className="text-gray-400 text-sm">
+                      <div
+                        className={`mt-2 overflow-hidden transition-all duration-500 ease-in-out ${
+                          openRowId === version.id ? "max-h-screen" : "max-h-0"
+                        }`}
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs sm:text-sm mt-2">
+                          <p className="text-gray-400">
                             Price: Kr {version.price}
                           </p>
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-gray-400">
                             Status: {version.status}
                           </p>
-
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-gray-400">
                             Saved by: {version.saved_by_user_id}
                           </p>
-
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-gray-400">
                             Saved at:{" "}
                             {new Date(version.saved_at).toLocaleString()}
                           </p>
-
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-gray-400 sm:col-span-2">
                             Version id: {version.id}
                           </p>
                         </div>

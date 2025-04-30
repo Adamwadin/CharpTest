@@ -4,38 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { UserProfile } from "../types/user";
+import { checkAdminAuth } from "@/utils/checkAdminAuth";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [users, setUsers] = useState<UserProfile[]>([]);
-  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/login");
-        return;
-      }
-
-      const { data: currentProfile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      //security check for user authentication
-      // if user is not authenticated, redirect to login page
-      // so no one just types /dashboard in the url and gets access to the dashboard
-      if (currentProfile?.role !== "admin") {
-        router.push("/dashboard");
-        return;
-      }
-
-      setCurrentUserRole(currentProfile.role);
+      checkAdminAuth(router);
 
       const { data: allProfiles, error } = await supabase
         .from("profiles")
@@ -72,7 +50,7 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-login bg-gray-900 flex items-center justify-center px-4">
         <div className="bg-gray-800 p-6 rounded-lg shadow-md flex items-center space-x-4">
           <div className="w-6 h-6 border-2 border-t-transparent border-[#14c0c7] rounded-full animate-spin"></div>
           <p className="text-white font-medium">Loading users...</p>
@@ -82,16 +60,14 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-login bg-cover bg-center relative">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-white">User Management</h1>
-            </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h1 className="text-4xl font-bold text-white">User Management</h1>
 
-            <div className="flex items-center">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#14c0c7] text-white">
+            <div>
+              <span className="inline-flex items-center px-3 py-1 rounded-sm text-sm font-medium bg-[#14c0c7] text-white">
                 {users.length} Users
               </span>
             </div>
@@ -100,25 +76,16 @@ export default function AdminDashboardPage() {
 
         <div className="bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-700">
+            <table className="min-w-[600px] w-full divide-y divide-gray-700">
               <thead>
                 <tr className="bg-gray-700">
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                     Email
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                     Role
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -135,8 +102,8 @@ export default function AdminDashboardPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           user.role === "admin"
-                            ? "bg-[#14c0c7] text-white-200"
-                            : "bg-grey-700 text-white-200"
+                            ? "bg-[#14c0c7] text-white"
+                            : "bg-gray-700 text-white"
                         }`}
                       >
                         {user.role}
@@ -146,14 +113,14 @@ export default function AdminDashboardPage() {
                       {user.role !== "admin" ? (
                         <button
                           onClick={() => handleChangeRole(user.id, "admin")}
-                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-[#14c0c7] hover:bg-[#0ea5a7] "
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-[#14c0c7] hover:bg-[#0ea5a7]"
                         >
                           Promote to Admin
                         </button>
                       ) : (
                         <button
                           onClick={() => handleChangeRole(user.id, "viewer")}
-                          className="inline-flex items-center px-3 py-1.5 border border-gray-600 text-xs font-medium rounded shadow-sm text-white bg-gray-700 hover:bg-gray-600 "
+                          className="inline-flex items-center px-3 py-1.5 border border-gray-600 text-xs font-medium rounded shadow-sm text-white bg-gray-700 hover:bg-gray-600"
                         >
                           Change to Viewer
                         </button>

@@ -28,7 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-gray-900 text-white">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        ></link>
+      </head>
+
+      <body className="font-supreme">
         <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />

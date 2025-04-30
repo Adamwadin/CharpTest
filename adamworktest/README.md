@@ -15,7 +15,7 @@ Live on charp-test.vercel.app
   - **Viewer**: Read-only access to content
 
 - Checking if user is logged in for every page so you someone cant access everything by typing the page in the URL.
-- To make it easier for you i disregarded the option to have to verify mail when creating an account.
+- To make it easier for you i disregarded the option to have to verify mail when creating an account. if you want to test it.
 
 ### Content Management
 
@@ -24,7 +24,7 @@ Live on charp-test.vercel.app
   - Add new content
   - Edit existing items
   - Automatically save previous versions before updates
-  - Restore older versions from version history
+  - Restore older versions from version history (see comment on this function)
 
 ### Real-Time Conflict Detection
 
@@ -39,6 +39,7 @@ Then on user A change name of the product,
 Then try to change it on user B
 
 It Will pop up a toaster pop-up saying you need to refresh because another admin is working on it.
+edit mode will go false and the product is fetched again. So yu can try again.
 
 ### User Management
 

@@ -3,31 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { checkAuth } from "@/utils/checkAuth";
 
 export default function CreateProductPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [status, setStatus] = useState("draft");
-  const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  //security check for user authentication
-  // if user is not authenticated, redirect to login page
-  // so no one just types /dashboard in the url and gets access to the dashboard
   useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/login");
-      }
-    };
-
-    checkAuth();
+    checkAuth(router);
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,10 +43,10 @@ export default function CreateProductPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900">
+    <div className="flex min-h-screen bg-login items-center justify-center bg-gray-900 px-4">
       <div className="w-full max-w-lg">
         <div className="border border-gray-700 bg-gray-800 rounded-lg shadow-sm">
-          <div className="border-b border-gray-700 px-8 py-6">
+          <div className="border-b border-gray-700 px-4 sm:px-8 py-6 sm:py-8">
             <h1 className="text-2xl font-semibold text-white">
               Create New Product
             </h1>
@@ -68,7 +55,7 @@ export default function CreateProductPage() {
             </p>
           </div>
 
-          <div className="px-8 py-6">
+          <div className="px-4 sm:px-8 py-6 sm:py-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-white">
@@ -124,11 +111,11 @@ export default function CreateProductPage() {
                 </div>
               )}
 
-              <div className="flex justify-end pt-4">
+              <div className="flex flex-col sm:flex-row sm:justify-end gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => router.push("/dashboard")}
-                  className="mr-4 rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-[#14c0c7] focus:ring-offset-2"
+                  className="rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-[#14c0c7] focus:ring-offset-2"
                 >
                   Back
                 </button>
