@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabaseClient";
-import { Mail, Lock, ArrowRight, LogOut } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import Image from "next/image";
 
 export default function LoginPage() {
@@ -104,13 +104,14 @@ export default function LoginPage() {
       <div className="flex rounded-xl border-radius items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 px-4 py-6 sm:px-6">
         <div className="w-full max-w-md overflow-hidden rounded shadow-xl bg-gray-900">
           <div className="bg-gradient-to-r from-gray-800 to-gray-700 px-4 sm:px-8 py-4 sm:py-6 text-white">
-            <div className="h-8 sm:h-10 w-full flex justify-center items-center">
+            <div className="h-8 sm:h-10 w-full flex justify-center items-center ">
               <Image
-                src="/charp.png"
+                src="/cms.png"
                 alt="Logo"
-                width={160}
-                height={160}
-                className="mx-auto sm:mt-4"
+                width={330}
+                height={200}
+                priority
+                className="mx-auto sm:mt-4 "
               />
             </div>
           </div>
