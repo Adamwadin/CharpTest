@@ -113,14 +113,14 @@ export default function AdminDashboardPage() {
                       {user.role !== "admin" ? (
                         <button
                           onClick={() => handleChangeRole(user.id, "admin")}
-                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-[#14c0c7] hover:bg-[#0ea5a7]"
+                          className=" cursor-pointer inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-[#14c0c7] hover:bg-[#0ea5a7]"
                         >
                           Promote to Admin
                         </button>
                       ) : (
                         <button
                           onClick={() => handleChangeRole(user.id, "viewer")}
-                          className="inline-flex items-center px-3 py-1.5 border border-gray-600 text-xs font-medium rounded shadow-sm text-white bg-gray-700 hover:bg-gray-600"
+                          className="cursor-pointer inline-flex items-center px-3 py-1.5 border border-gray-600 text-xs font-medium rounded shadow-sm text-white bg-gray-700 hover:bg-gray-600"
                         >
                           Change to Viewer
                         </button>
