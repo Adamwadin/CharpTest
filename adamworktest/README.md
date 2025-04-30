@@ -62,6 +62,7 @@ edit mode will go false and the product is fetched again. So yu can try again.
 ### 1. Clone the repo
 
 git clone https://github.com/Adamwadin/CharpTest.git
+
 cd adamworktest
 
 npm install
