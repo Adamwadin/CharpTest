@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-gray-800/90 text-white relative z-50 sticky top-0  transition-all duration-300 ease-in-out opacity-90  shadow-lg">
-      <div className="max-w-7xl mx-auto flex items-center justify-between p-4 backdrop-blur-xl bg-gray-800 rounded-lg">
+      <div className="max-w-7xl mx-auto flex items-center justify-between p-4 backdrop-blur-xl  rounded-lg">
         <button className="md:hidden focus:outline-none" onClick={toggleMenu}>
           <span
             className={`block w-8 h-0.5 bg-white transition-all duration-300 ease-in-out ${
