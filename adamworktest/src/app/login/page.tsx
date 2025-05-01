@@ -143,7 +143,7 @@ export default function LoginPage() {
                 <div className="space-y-1 sm:space-y-2">
                   <label
                     htmlFor="email"
-                    className="text-xs sm:text-sm font-medium text-white flex items-center gap-2"
+                    className="text-xs sm:text-sm font-medium text-white flex items-center gap-2 hover:"
                   >
                     <Mail size={14} className="text-[#14c0c7]" />
                     Email Address
@@ -155,7 +155,7 @@ export default function LoginPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-lg border border-gray-600 bg-gray-800 p-2 sm:p-3 pr-10 text-white text-sm focus:border-[#14c0c7] focus:ring focus:ring-[#14c0c7] focus:ring-opacity-50"
+                      className="w-full rounded-lg border border-gray-600 bg-gray-800 p-2 sm:p-3 pr-10 text-white text-sm focus:border-[#14c0c7] focus:ring focus:ring-[#14c0c7] focus:ring-opacity-50 transition-colors duration-300  hover:border-[#14c0c7]"
                       placeholder="your@email.com"
                     />
                   </div>
@@ -176,7 +176,7 @@ export default function LoginPage() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-lg border border-gray-600 bg-gray-800 p-2 sm:p-3 pr-10 text-white text-sm focus:border-[#14c0c7] focus:ring focus:ring-[#14c0c7] focus:ring-opacity-50"
+                      className="transition-colors duration-300  hover:border-[#14c0c7] w-full rounded-lg border border-gray-600 bg-gray-800 p-2 sm:p-3 pr-10 text-white text-sm focus:border-[#14c0c7] focus:ring focus:ring-[#14c0c7] focus:ring-opacity-50"
                       placeholder="••••••••"
                     />
                   </div>
@@ -207,7 +207,7 @@ export default function LoginPage() {
                       setIsSignUp(!isSignUp);
                       setError("");
                     }}
-                    className="text-[#14c0c7] hover:underline"
+                    className="text-[#14c0c7] hover:underline cursor-pointer transition duration-300 ease-in-out"
                   >
                     {isSignUp ? "Sign In" : "Create Account"}
                   </button>

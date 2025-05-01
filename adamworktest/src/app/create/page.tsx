@@ -50,9 +50,6 @@ export default function CreateProductPage() {
             <h1 className="text-2xl font-semibold text-white">
               Create New Product
             </h1>
-            <p className="mt-1 text-sm text-gray-400">
-              Complete the form below to add a new product to inventory
-            </p>
           </div>
 
           <div className="px-4 sm:px-8 py-6 sm:py-8">
@@ -66,7 +63,7 @@ export default function CreateProductPage() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 shadow-sm text-white focus:border-[#14c0c7] focus:outline-none focus:ring-1 focus:ring-[#14c0c7]"
+                  className="transition-colors duration-300  hover:border-[#14c0c7] w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 shadow-sm text-white focus:border-[#14c0c7] focus:outline-none focus:ring-1 focus:ring-[#14c0c7]"
                   placeholder="Enter product title"
                 />
               </div>
@@ -85,7 +82,7 @@ export default function CreateProductPage() {
                     required
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="w-full rounded-md border border-gray-600 bg-gray-700 pl-7 pr-4 py-2 text-white focus:border-[#14c0c7] focus:outline-none focus:ring-1 focus:ring-[#14c0c7]"
+                    className="transition-colors duration-300  hover:border-[#14c0c7] w-full rounded-md border border-gray-600 bg-gray-700 pl-7 pr-4 py-2 text-white focus:border-[#14c0c7] focus:outline-none focus:ring-1 focus:ring-[#14c0c7]"
                     placeholder="0.00"
                   />
                 </div>
@@ -98,7 +95,7 @@ export default function CreateProductPage() {
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 shadow-sm text-white focus:border-[#14c0c7] focus:outline-none focus:ring-1 focus:ring-[#14c0c7]"
+                  className="transition-colors duration-300  hover:border-[#14c0c7] w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 shadow-sm text-white focus:border-[#14c0c7] focus:outline-none focus:ring-1 focus:ring-[#14c0c7]"
                 >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>

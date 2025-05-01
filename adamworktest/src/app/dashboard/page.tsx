@@ -104,13 +104,13 @@ export default function DashboardPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => router.push("/adminDashboard")}
-                className="bg-[#14c0c7] hover:bg-[#0ea5a7] px-4 py-2 rounded text-white font-semibold"
+                className="bg-[#14c0c7] hover:bg-[#0ea5a7] px-4 py-2 rounded text-white font-semibold cursor-pointer"
               >
                 Admin Panel
               </button>
               <button
                 onClick={() => router.push("/create")}
-                className="bg-[#14c0c7] hover:bg-[#0ea5a7] px-4 py-2 rounded text-white font-semibold"
+                className="bg-[#14c0c7] hover:bg-[#0ea5a7] px-4 py-2 rounded text-white font-semibold cursor-pointer"
               >
                 + Add Product
               </button>
@@ -122,7 +122,7 @@ export default function DashboardPage() {
           <input
             type="text"
             placeholder="Search by title..."
-            className="px-4 py-2 rounded-md bg-gray-800 text-white border border-gray-600 w-full sm:w-1/3"
+            className="transition-colors duration-300  hover:border-[#14c0c7] px-4 py-2 rounded-md bg-gray-800 text-white border border-gray-600 w-full sm:w-1/3"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -130,7 +130,7 @@ export default function DashboardPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 rounded-md bg-gray-800 text-white border border-gray-600 cursor-pointer"
+              className="transition-colors duration-300  hover:border-[#14c0c7] px-4 py-2 rounded-md bg-gray-800 text-white border border-gray-600 cursor-pointer"
             >
               <option value="all">All Statuses</option>
               <option value="draft">Draft</option>
@@ -197,7 +197,7 @@ export default function DashboardPage() {
                     <td className="p-3 text-center">
                       <button
                         onClick={() => router.push(`/products/${product.id}`)}
-                        className="px-3 py-1 border border-gray-500 rounded-md bg-gray-700 hover:bg-[#14c0c7] text-sm font-medium transition"
+                        className="cursor-pointer px-3 py-1 border border-gray-500 rounded-md bg-gray-700 hover:bg-[#14c0c7] text-sm font-medium transition"
                       >
                         View
                       </button>
@@ -210,7 +210,7 @@ export default function DashboardPage() {
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
+                className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50 cursor-pointer"
               >
                 Prev
               </button>
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
+                className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50 cursor-pointer"
               >
                 Next
               </button>

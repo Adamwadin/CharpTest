@@ -322,17 +322,17 @@ export default function ProductPage() {
 
         <div className="bg-gray-800 shadow overflow-hidden rounded-lg">
           <div className="px-4 py-4 sm:px-6 sm:py-5 md:p-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6 sm:gap-8">
               <div className="w-full sm:w-auto">
                 {editMode ? (
                   <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full border rounded p-2 mt-1 bg-gray-700 text-white text-lg sm:text-xl font-bold"
+                    className=" transition-colors duration-300  hover:border-[#14c0c7] w-full border border-gray-600 rounded-lg p-3 mt-1 bg-gray-700 text-white text-lg sm:text-xl font-bold focus:outline-none focus:ring-1 focus:ring-[#14c0c7] transition duration-300 "
                   />
                 ) : (
-                  <h1 className="text-xl font-bold text-white sm:text-2xl md:text-3xl">
+                  <h1 className="text-2xl font-bold text-white sm:text-3xl md:text-4xl">
                     {product?.title || "Loading..."}
                   </h1>
                 )}
@@ -341,15 +341,15 @@ export default function ProductPage() {
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
-                    className="w-full border rounded p-2 bg-gray-700 text-white mt-1 text-sm cursor-pointer"
+                    className="transition-colors duration-300  hover:border-[#14c0c7] w-full border border-gray-600 rounded-lg p-3 bg-gray-700 text-white mt-2 text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#14c0c7] transition duration-300"
                   >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
                   </select>
                 ) : (
-                  <div className="mt-1">
+                  <div className="mt-2">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                         product?.status === "active" ||
                         product?.status === "published"
                           ? "bg-green-700 text-green-200"
@@ -368,10 +368,10 @@ export default function ProductPage() {
                   step="0.01"
                   value={editPrice}
                   onChange={(e) => setEditPrice(e.target.value)}
-                  className="w-full sm:w-40 border rounded p-2 bg-gray-700 text-white text-lg font-semibold"
+                  className="transition-colors duration-300  hover:border-[#14c0c7] w-full sm:w-48 border border-gray-600 rounded-lg p-3 bg-gray-700 text-white text-lg font-semibold focus:outline-none focus:ring-1 focus:ring-[#14c0c7] transition duration-300"
                 />
               ) : (
-                <div className="text-xl sm:text-2xl font-bold text-white">
+                <div className="text-2xl sm:text-3xl font-bold text-white">
                   Price: Kr {product?.price}
                 </div>
               )}
@@ -435,7 +435,7 @@ export default function ProductPage() {
                 {!editMode ? (
                   <button
                     onClick={startEditing}
-                    className="px-3 py-1 bg-blue-600 text-white rounded"
+                    className="px-3 py-1 bg-[#14c0c7] text-white rounded -md hover:bg-[#0ea5a7] cursor-pointer text-sm sm:text-base "
                   >
                     Edit Product
                   </button>
