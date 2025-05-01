@@ -28,18 +28,25 @@ Live on charp-test.vercel.app
 
 ### Real-Time Conflict Detection
 
-**Approach:**  
-Before saving edits to a product, the app checks whether the `updated_at` timestamp in the database has changed since the item was loaded. If it has, the user is warned that another admin has made changes. This avoids accidental overwrites.
+**Approach:**
 
-Easiest way to test this is by using two diffrent browsers and login into both Adam and Arjun (after making them both admin)
+UPDATED!
+I completely re-did this functionalty from how it was before, had some time over and sat down and reaserched a better way to do it. and came up with this :)
 
-Click view on the same product.
-Open edit on both.
-Then on user A change name of the product,
-Then try to change it on user B
+The one before was unreliable because both could be in edit mode at the same time.
 
-It Will pop up a toaster pop-up saying you need to refresh because another admin is working on it.
-edit mode will go false and the product is fetched again. So yu can try again.
+When an admin clicks Edit Product, the app tries to update the products locked_by column with their own user ID, but only if it's NULL.
+
+If the lock fails (someone else already locked it), it fetches the editor's email and shows a friendly toast message.
+
+The lock is cleared:
+When the user clicks Cancel
+if the user saves the product
+if the user closes or refreshes the tab (using beforeunload)
+
+Also displays who is editing so you can yell at them loudly to work faster!
+
+would be good with a timeout like function, if someone left their computer at the editing mode for more then lets say 15 min the lock is automatically erased and user gets thrown to the dashboard.
 
 ### User Management
 

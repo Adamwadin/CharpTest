@@ -20,6 +20,8 @@ export default function ProductPage() {
   const [versionHistory, setVersionHistory] = useState<any[]>([]);
   const [showVersions, setShowVersions] = useState(false);
   const [openRowId, setOpenRowId] = useState<string | null>(null);
+  const [lockedBy, setLockedBy] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth(router);
@@ -32,9 +34,8 @@ export default function ProductPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      console.log("User:", user);
-
       if (user) {
+        setCurrentUserId(user.id);
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("role")
@@ -55,14 +56,13 @@ export default function ProductPage() {
     const interval = setInterval(() => {
       fetchData();
     }, 5000);
+    return () => clearInterval(interval);
   }, [id]);
-
-  //So i can fetch the product again after updating it
 
   const fetchProduct = async () => {
     const { data, error } = await supabase
       .from("products")
-      .select("id, title, status, price, created_at, updated_at")
+      .select("id, title, status, price, created_at, updated_at, locked_by")
       .eq("id", id)
       .single();
 
@@ -70,23 +70,9 @@ export default function ProductPage() {
       console.error("Error fetching product:", error.message);
     } else {
       setProduct(data);
+      setLockedBy(data.locked_by);
     }
     setLoading(false);
-  };
-
-  const fetchVersions = async () => {
-    const { data, error } = await supabase
-      .from("product_versions")
-      .select("*")
-      .eq("product_id", product?.id)
-      .order("saved_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching versions:", error.message);
-    } else {
-      setVersionHistory(data);
-      setShowVersions(true);
-    }
   };
 
   const deleteVersion = async (versionId: string) => {
@@ -103,75 +89,6 @@ export default function ProductPage() {
       setVersionHistory((prev) =>
         prev.filter((version) => version.id !== versionId)
       );
-    }
-  };
-
-  const handleSave = async () => {
-    if (!product) return;
-
-    const { data: latestProduct, error: fetchError } = await supabase
-      .from("products")
-      .select("updated_at, title, price, status")
-      .eq("id", product.id)
-      .single();
-
-    if (fetchError) {
-      console.error("Error fetching latest product:", fetchError.message);
-      return;
-    }
-    console.log("latest:", latestProduct.updated_at);
-    console.log("local :", product.updated_at);
-    console.log(
-      "diff   :",
-      new Date(latestProduct.updated_at).getTime() !==
-        new Date(product.updated_at).getTime()
-    );
-    if (
-      new Date(latestProduct.updated_at).getTime() !==
-      new Date(product.updated_at).getTime()
-    ) {
-      toast.error("Another admin updated this item.");
-      toast.error("Products is now up to date, please try again.");
-      setEditMode(false);
-      fetchProduct();
-
-      return;
-    }
-
-    const { data: userData } = await supabase.auth.getUser();
-    // I wanted to also save the current version of the product before restoring an older version
-    // but not sure of the logic yet
-
-    await supabase.from("product_versions").insert({
-      product_id: product.id,
-      title: latestProduct.title,
-      price: latestProduct.price,
-      status: latestProduct.status,
-      saved_by_user_id: userData.user?.id,
-    });
-
-    const { error } = await supabase
-      .from("products")
-      .update({
-        title: editTitle,
-        price: parseFloat(editPrice),
-        status: editStatus,
-      })
-      .eq("id", product.id);
-
-    if (error) {
-      console.error("Error updating product:", error.message);
-    } else {
-      setProduct({
-        ...product,
-        title: editTitle,
-        price: parseFloat(editPrice),
-        status: editStatus,
-        updated_at: new Date().toISOString(),
-      });
-      setEditMode(false);
-      toast.success("Product updated successfully!");
-      fetchVersions();
     }
   };
 
@@ -211,56 +128,172 @@ export default function ProductPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-login bg-gray-900">
-        <div className="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md">
-          <div className="flex items-center space-x-4">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-[#14c0c7] border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-base sm:text-lg font-medium text-white">
-              Loading product details...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  // incase for some reason the product is not found, show a 404 page
-  if (!product) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4 ">
-        <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-md text-center w-full max-w-md">
-          <div className="text-gray-400 mb-4">
-            <svg
-              className="mx-auto h-10 w-10 sm:h-12 sm:w-12"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">
-            Product Not Found
-          </h2>
-          <p className="text-gray-400 mb-4 text-sm sm:text-base">
-            The product you're looking for doesn't exist or has been removed.
-          </p>
-          <button
-            onClick={() => router.back()}
-            className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#14c0c7] hover:bg-[#0ea5a7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14c0c7]"
-          >
-            Return to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
+  //reasearched on how to build a locking mechanism better then the one i had before since i had some time over :)
+  //i completly redid the locking mechanism from my first time (can check other commmits)
+  //and if you try to edit it while someone else is editing it will show a message with the email of the person who is editing it
+  //this works way better then last time and i am happy with it, also added so if a user tries to refresh the page it will release the lock ( even if someone jsut closes the tab)
+
+  //also checks iff the supabase locked_by uuid is the same as the locked_by uuid and if not it will show a message that someone else is editing it
+
+  //pretty proud of this one, i think it works really well and is a good solution for the problem
+
+  const attemptLock = async () => {
+    if (!product || !currentUserId) return false;
+
+    const { data, error } = await supabase
+      .from("products")
+      .update({ locked_by: currentUserId })
+      .eq("id", product.id)
+      .is("locked_by", null)
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      const { data: lockInfo } = await supabase
+        .from("products")
+        .select("locked_by")
+        .eq("id", product.id)
+        .single();
+
+      if (lockInfo?.locked_by && lockInfo.locked_by !== currentUserId) {
+        const { data: editorProfile } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("id", lockInfo.locked_by)
+          .single();
+
+        const editorName = editorProfile?.email;
+        toast(
+          `${editorName} is currently editing this product. Run to their desk and tell them to hurry up! :)`,
+          {
+            icon: "⚠️",
+          }
+        );
+      }
+      return false;
+    }
+
+    setLockedBy(currentUserId);
+    return true;
+  };
+  const releaseLock = async () => {
+    if (!product || !currentUserId) return;
+
+    await supabase
+      .from("products")
+      .update({ locked_by: null })
+      .eq("id", product.id)
+      .eq("locked_by", currentUserId);
+
+    setLockedBy(null);
+  };
+
+  const handleSave = async () => {
+    if (!product) return;
+
+    const { data: latestProduct, error: fetchError } = await supabase
+      .from("products")
+      .select("updated_at, title, price, status")
+      .eq("id", product.id)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching latest product:", fetchError.message);
+      return;
+    }
+
+    if (
+      new Date(latestProduct.updated_at).getTime() !==
+      new Date(product.updated_at).getTime()
+    ) {
+      toast.error("Another admin updated this item.");
+      toast.error("Products is now up to date, please try again.");
+      setEditMode(false);
+      fetchProduct();
+      return;
+    }
+
+    const { data: userData } = await supabase.auth.getUser();
+
+    await supabase.from("product_versions").insert({
+      product_id: product.id,
+      title: latestProduct.title,
+      price: latestProduct.price,
+      status: latestProduct.status,
+      saved_by_user_id: userData.user?.id,
+    });
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        title: editTitle,
+        price: parseFloat(editPrice),
+        status: editStatus,
+      })
+      .eq("id", product.id);
+
+    if (error) {
+      console.error("Error updating product:", error.message);
+    } else {
+      setProduct({
+        ...product,
+        title: editTitle,
+        price: parseFloat(editPrice),
+        status: editStatus,
+        updated_at: new Date().toISOString(),
+      });
+      toast.success("Product updated successfully!");
+      fetchVersions();
+    }
+    setEditMode(false);
+    releaseLock();
+  };
+
+  const startEditing = async () => {
+    const success = await attemptLock();
+    if (success) {
+      setEditMode(true);
+      setEditTitle(product?.title || "");
+      setEditPrice(product?.price?.toString() || "");
+      setEditStatus(product?.status || "");
+    }
+  };
+
+  const fetchVersions = async () => {
+    const { data, error } = await supabase
+      .from("product_versions")
+      .select("*")
+      .eq("product_id", product?.id)
+      .order("saved_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching versions:", error.message);
+    } else {
+      setVersionHistory(data);
+      setShowVersions(true);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (editMode) {
+        releaseLock();
+      }
+    };
+  }, [editMode]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (editMode) releaseLock();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      if (editMode) releaseLock();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [editMode]);
 
   return (
     <div className="min-h-screen bg-gray-900 py-4 sm:py-8 bg-login">
@@ -300,7 +333,7 @@ export default function ProductPage() {
                   />
                 ) : (
                   <h1 className="text-xl font-bold text-white sm:text-2xl md:text-3xl">
-                    {product.title}
+                    {product?.title || "Loading..."}
                   </h1>
                 )}
 
@@ -317,13 +350,13 @@ export default function ProductPage() {
                   <div className="mt-1">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        product.status === "active" ||
-                        product.status === "published"
+                        product?.status === "active" ||
+                        product?.status === "published"
                           ? "bg-green-700 text-green-200"
                           : "bg-yellow-700 text-yellow-200"
                       }`}
                     >
-                      {product.status}
+                      {product?.status}
                     </span>
                   </div>
                 )}
@@ -339,7 +372,7 @@ export default function ProductPage() {
                 />
               ) : (
                 <div className="text-xl sm:text-2xl font-bold text-white">
-                  Price: Kr {product.price}
+                  Price: Kr {product?.price}
                 </div>
               )}
             </div>
@@ -354,13 +387,17 @@ export default function ProductPage() {
                   <dt className="text-sm font-medium text-gray-400">
                     Product ID
                   </dt>
-                  <dd className="mt-1 text-sm text-white">{product.id}</dd>
+                  <dd className="mt-1 text-sm text-white">
+                    {product?.id || "N/A"}
+                  </dd>
                 </div>
 
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-400">Created</dt>
                   <dd className="mt-1 text-sm text-white">
-                    {new Date(product.created_at).toLocaleString()}
+                    {product?.created_at
+                      ? new Date(product.created_at).toLocaleString()
+                      : "N/A"}
                   </dd>
                 </div>
 
@@ -369,7 +406,9 @@ export default function ProductPage() {
                     Last Updated
                   </dt>
                   <dd className="mt-1 text-sm text-white">
-                    {new Date(product.updated_at).toLocaleString()}
+                    {product?.updated_at
+                      ? new Date(product.updated_at).toLocaleString()
+                      : "N/A"}
                   </dd>
                 </div>
               </dl>
@@ -395,13 +434,8 @@ export default function ProductPage() {
               <div className="mt-6 sm:mt-8 flex justify-end space-x-3 sm:space-x-4">
                 {!editMode ? (
                   <button
-                    onClick={() => {
-                      setEditMode(true);
-                      setEditTitle(product.title);
-                      setEditPrice(product.price.toString());
-                      setEditStatus(product.status);
-                    }}
-                    className="px-3 py-1 sm:px-4 sm:py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-white bg-[#14c0c7] hover:bg-[#0ea5a7] cursor-pointer"
+                    onClick={startEditing}
+                    className="px-3 py-1 bg-blue-600 text-white rounded"
                   >
                     Edit Product
                   </button>

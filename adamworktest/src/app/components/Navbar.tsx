@@ -59,6 +59,7 @@ const Navbar: React.FC = () => {
         </button>
 
         <div className="text-xl font-bold">
+          {/* Dont realy have a good page to link this to */}
           <Image
             src="/charp.png"
             alt="Logo"
