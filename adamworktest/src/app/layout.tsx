@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
         <main className="min-h-screen">{children}</main>
         <Footer />
         <Toaster position="top-center" reverseOrder={false} />
+        <Analytics />
       </body>
     </html>
   );
